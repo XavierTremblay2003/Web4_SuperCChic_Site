@@ -15,6 +15,7 @@ import Logout from './Auth/Logout';
 import SignUp from './Auth/SignUp';
 
 import NotFound from './NotFound';
+import ProduitCard from './Epicerie/ProduitCard';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -25,6 +26,7 @@ root.render(
       <Routes>
         <Route path="/" element={<ProtectedRoutes />}>
           <Route path="" element={<App />}>
+            <Route path="" element={<ProduitCard /> } />
             <Route path="category/:id" element={<CategoryView />} />
           </Route>
         </Route>
