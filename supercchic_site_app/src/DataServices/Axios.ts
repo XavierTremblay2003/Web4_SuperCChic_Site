@@ -1,6 +1,11 @@
 import axios from 'axios';
 import { IAuthData } from '../DataInterfaces/IUserData';
 
+
+export const baseAccessTokenName = "supercchic_access_token";
+export const baseUserNameVariableName = "supercchic_user_name"
+const baseRefreshTokenName = "supercchic_refresh_token"
+
 const baseURL = 'http://localhost:8000/';
 const headerToken = 'Bearer ';
 
@@ -8,8 +13,8 @@ const axiosInstance = axios.create({
   baseURL,
   timeout: 30000, // 30 seconds
   headers: {
-    'Authorization': localStorage.getItem('supercchic_access_token')
-      ? headerToken + localStorage.getItem('supercchic_access_token')
+    'Authorization': localStorage.getItem(baseAccessTokenName)
+      ? headerToken + localStorage.getItem(baseAccessTokenName)
       : null,
     'Content-Type': 'application/json',
     'Accept': 'application/json',
@@ -17,16 +22,16 @@ const axiosInstance = axios.create({
 });
 
 export const setLocalToken = (authData: IAuthData): void => {
-  localStorage.setItem('supercchic_access_token', authData.access);
-  localStorage.setItem('supercchic_refresh_token', authData.refresh);
-  localStorage.setItem('supercchic_user_name', authData.user.first_name);
+  localStorage.setItem(baseAccessTokenName, authData.access);
+  localStorage.setItem(baseRefreshTokenName, authData.refresh);
+  localStorage.setItem(baseUserNameVariableName, authData.user.first_name);
   axiosInstance.defaults.headers.Authorization = headerToken + authData.access;
 }
 
 export const unsetLocalToken = (): void => {
-  localStorage.removeItem('supercchic_access_token');
-  localStorage.removeItem('supercchic_refresh_token');
-  localStorage.removeItem('supercchic_user_name');
+  localStorage.removeItem(baseAccessTokenName);
+  localStorage.removeItem(baseRefreshTokenName);
+  localStorage.removeItem(baseUserNameVariableName);
   axiosInstance.defaults.headers.Authorization = null;
 }
 
@@ -39,7 +44,7 @@ axiosInstance.interceptors.response.use(
       if (error.response) {
         if (error.response.status === 401) {
           if (error.response.data.code === 'token_not_valid') {
-            const refreshToken: string | null = localStorage.getItem('supercchic_refresh_token');
+            const refreshToken: string | null = localStorage.getItem(baseRefreshTokenName);
 
             if (refreshToken) {
               const tokenParts = JSON.parse(atob(refreshToken.split('.')[1]));
@@ -52,9 +57,9 @@ axiosInstance.interceptors.response.use(
                   .post('auth/token-refresh/', { refresh: refreshToken })
                   .then((response) => {
                     console.log('Axios - Access token refreshed');
-                    localStorage.setItem('supercchic_access_token', response.data.access);
+                    localStorage.setItem(baseAccessTokenName, response.data.access);
                     if (response.data.refresh) {
-                      localStorage.setItem('supercchic_refresh_token', response.data.refresh);
+                      localStorage.setItem(baseRefreshTokenName, response.data.refresh);
                     }
 
                     axiosInstance.defaults.headers.Authorization =  headerToken + response.data.access;

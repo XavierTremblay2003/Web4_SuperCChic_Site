@@ -1,7 +1,8 @@
 import { Navigate, Outlet } from 'react-router-dom';
+import { baseAccessTokenName } from '../DataServices/Axios';
 
 const useAuth = (): boolean => {
-  const accessToken: string | null = localStorage.getItem('supercchic_access_token');
+  const accessToken: string | null = localStorage.getItem(baseAccessTokenName);
   return accessToken !== null;
 }
 

@@ -27,6 +27,7 @@ import {
   Logout as LogoutIcon,
   PersonOutlineOutlined as PersonOutlineOutlinedIcon,
 } from '@mui/icons-material';
+import { baseUserNameVariableName } from '../DataServices/Axios';
 
 function Banner(): JSX.Element {
   //console.log('Load Banner Component');
@@ -104,14 +105,14 @@ function Banner(): JSX.Element {
                 horizontal: 'right',
               }}
             >
-              {localStorage.getItem('demo_user_name') ? (
+              {localStorage.getItem(baseUserNameVariableName) ? (
                 <MenuItem sx={{ py: '4px' }}>
                   <ListItemIcon>
                     <PersonOutlineOutlinedIcon fontSize="small" />
                   </ListItemIcon>
                   <ListItemText>
                     <Typography sx={{ fontSize: '0.95rem' }}>
-                      {localStorage.getItem('demo_user_name')}
+                      {localStorage.getItem(baseUserNameVariableName)}
                     </Typography>
                   </ListItemText>
                 </MenuItem>
