@@ -6,7 +6,6 @@ import './index.css';
 
 import ProtectedRoutes from './App/ProtectedRoutes';
 import App from './App/App';
-import CategoryView from './App/CategoryView';
 
 import AuthRoutes from './Auth/AuthRoutes';
 import AuthContainer from './Auth/AuthContainer';
@@ -16,6 +15,7 @@ import SignUp from './Auth/SignUp';
 
 import NotFound from './NotFound';
 import ProduitCard from './Epicerie/ProduitCard';
+import ProduitCardControler from './Epicerie/ProduitCardControler';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -26,8 +26,8 @@ root.render(
       <Routes>
         <Route path="/" element={<ProtectedRoutes />}>
           <Route path="" element={<App />}>
-            <Route path="" element={<ProduitCard /> } />
-            <Route path="category/:id" element={<CategoryView />} />
+            <Route path="" element={<ProduitCardControler recherche='allo' /> } />
+            <Route path="category/:id" element={<ProduitCardControler />} />
           </Route>
         </Route>
         <Route path="/auth" element={<AuthRoutes />}>

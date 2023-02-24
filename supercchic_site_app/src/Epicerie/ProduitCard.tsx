@@ -10,13 +10,18 @@ import { ChangeEvent, SyntheticEvent, useEffect, useState } from "react";
 import { useForm, UseFormRegisterReturn } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import FormTextField from '../Controls/FormTextField';
+import IProduitData from "../DataInterfaces/IProduitData";
 
 type FormLoginFields = {
   produitId: Number
   quantite: Number
 };
 
-export default function ProduitCard(): JSX.Element {
+type ProduitCardProps = {
+  produit : IProduitData
+}
+
+export default function ProduitCard({produit} : ProduitCardProps): JSX.Element {
   
   const [submitWarning, setSubmitWarning] = useState<string>('');
   const [submitError, setSubmitError] = useState<string>('');
@@ -49,15 +54,12 @@ export default function ProduitCard(): JSX.Element {
     setSubmitError('');    
   }
 
-  const [quantiteRegister, setQuantiteRegister] = useState<UseFormRegisterReturn<string>>(register("quantite"))
-
   const handleQuantiteFieldChange = (e : any) : void => {
 
-    if(isNaN(Number(e.target.value)) || e.target.value == "") {
+    if(isNaN(Number(e.target.value)) || e.target.value === "") {
       setNombreProduit(undefined);
     } else {
       setNombreProduit(Number(e.target.value));
-      quantiteRegister.onChange(e);
     }
   }
 
@@ -86,15 +88,15 @@ export default function ProduitCard(): JSX.Element {
       />
       <CardContent sx={{ textAlign: "center" }} >
         <Typography variant="h5" gutterBottom>
-          Je suis un produit
+          {produit.nom}
         </Typography>
         <Typography gutterBottom>
-          Je suis une description de produit
+          {produit.description}
         </Typography>
         <Box component="form" onSubmit={handleSubmit(handleFormSubmit) } >
           <Container sx={{ display: "flex", alignContent: "center", justifyContent: "center"}}>
             <IconButton onClick={() => testAjoutProduit(-1)} aria-label="retirerUn"> <RemoveIcon /> </IconButton>
-            <FormTextField onChangeCapture={handleQuantiteFieldChange} name={quantiteRegister.name} ref={quantiteRegister.ref} onBlur={quantiteRegister.onBlur} type="tel" value={nombreProduit} sx={{ maxWidth: 75 }}></FormTextField>
+            <FormTextField onChangeCapture={handleQuantiteFieldChange} registerReturn={register("quantite")} type="tel" value={nombreProduit} sx={{ maxWidth: 75 }}></FormTextField>
             <IconButton onClick={() => testAjoutProduit(1)} sx={{ alignSelf: "center" }} aria-label="retirerUn"> <AddIcon /> </IconButton>
           </Container>
           <Typography sx={{mb: 2 }} color="Red">{errors.quantite?.message}</Typography>

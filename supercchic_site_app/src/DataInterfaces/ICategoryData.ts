@@ -1,8 +1,9 @@
-import IProductData from './IProductData';
+import IProduitData from "./IProduitData"
+
 
 export default interface ICategoryData {
   id: number
   code: string
   name: string
-  products: IProductData[]
+  products: IProduitData[]
 }

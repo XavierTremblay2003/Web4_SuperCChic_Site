@@ -28,6 +28,7 @@ import {
   PersonOutlineOutlined as PersonOutlineOutlinedIcon,
 } from '@mui/icons-material';
 import { baseUserNameVariableName } from '../DataServices/Axios';
+import Recherche from '../Epicerie/Recherche';
 
 function Banner(): JSX.Element {
   //console.log('Load Banner Component');
@@ -64,7 +65,7 @@ function Banner(): JSX.Element {
   }
 
   return (
-    <AppBar position="static">
+    <AppBar sx={{background: "#D8551Eff"}} position="static">
       <Container component="nav">
         <Toolbar>
           {location.pathname !== '/' && (
@@ -75,8 +76,9 @@ function Banner(): JSX.Element {
             </Tooltip>
           )}
           <Typography variant="h6" sx={{ flexGrow: 1 }}>
-            Démo React App 
+            Super CChic
           </Typography>
+          <Recherche></Recherche>
           <Box>
             <Tooltip title={"Ouvrir le menu utilisateur"}>
               <IconButton
