@@ -4,14 +4,14 @@ import axiosInstance from './Axios';
 
 const rootPath = '/produits';
 
-const getAll = (): Promise<AxiosResponse<IProduitData[]>> =>
-  axiosInstance.get<unknown, AxiosResponse<IProduitData[]>>(rootPath);
+const getAllByPage = (page : number): Promise<AxiosResponse<any>> =>
+  axiosInstance.get<unknown, AxiosResponse<any>>(`${rootPath}/?page=${page}`);
 
 const get = (id: number): Promise<AxiosResponse<IProduitData>> =>
   axiosInstance.get<unknown, AxiosResponse<IProduitData>>(`${rootPath}/${id}`);
 
 const ProduitDataService = {
-  getAll,
+  getAllByPage,
   get,
 }
 

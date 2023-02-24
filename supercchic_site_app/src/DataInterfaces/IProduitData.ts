@@ -1,10 +1,11 @@
 export default interface IProduitData {
   id: number
   nom: string
-  codeUniverselProduit: string
+  code_universel_produit: string
   prix: number
-  quantiteInventaire : number,
-  estTaxable : number,
-  estActif : number,
-  description : string
+  quantite_inventaire : number,
+  est_taxable : number,
+  est_actif : number,
+  description : string,
+  url_image : string
 }

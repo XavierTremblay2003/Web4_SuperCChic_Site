@@ -1,4 +1,5 @@
-import { Grid, Typography } from "@mui/material";
+import { Co2Sharp } from "@mui/icons-material";
+import { Grid, Pagination, Typography } from "@mui/material";
 import { Container } from "@mui/system";
 import { type } from "@testing-library/user-event/dist/type";
 import { useEffect, useRef, useState } from "react";
@@ -14,43 +15,39 @@ type ProduitCardControlerProps = {
 
 
 export default function ProduitCardControler({ recherche }: ProduitCardControlerProps): JSX.Element {
-
-    const dataLoaded = useRef<boolean>(false);
     const [produits, setProduits] = useState<Array<IProduitData>>(Array<IProduitData>);
-
-    const aficherProduit = () => {
-        return produits.map(prod => {
-            return (
-                <Grid item xs={8} sm={6} lg={4}>
-                    <ProduitCard produit={prod} ></ProduitCard>
-                </Grid>
-            )
-        });
-    };
+    const [pageActuel, setPageActuel] = useState<number>(1);
+    const [pageTotal, setPageTotal] = useState<number>(0);
 
 
     useEffect(() => {
-        if (!dataLoaded.current) {
-            dataLoaded.current = true;
-            ProduitDataService.getAll()
-                .then((response) => {
-                    setProduits(response.data);
-                })
-                .catch((err) => {
-                    console.log("Erreur de connection a api");
-                })
-        }
+        ProduitDataService.getAllByPage(pageActuel)
+            .then((response) => {
+                setProduits(response.data.results);
+                setPageTotal(Math.ceil(response.data.count / 6));
+            })
+            .catch((err) => {
+                console.log("Erreur de connection a api");
+            })
 
-    }, [recherche]);
+    }, [recherche, pageActuel]);
+
+    const handlePageActuelChange = (e: any, value : number): void => {
+        setPageActuel(value)
+    }
+
 
     return (
-        <Grid sx={{ display: "flex", alignItems: "center ", justifyContent: "center" }} container spacing={2}>
-            {produits.map((produit) => (
-                <Grid item xs={8} sm={6} lg={4}>
-                    <ProduitCard produit={produit} ></ProduitCard>
-                </Grid>
-            ))}
+        <Container sx={{ display: "flex", alignItems: "center ", justifyContent: "center", flexDirection: "column" }}>
+            <Grid sx={{ display: "flex", alignItems: "center ", justifyContent: "center", mb: 5 }} container spacing={2}>
+                {produits.map((produit) => (
+                    <Grid key={produit.id} item xs={8} sm={6} lg={4}>
+                        <ProduitCard produit={produit} ></ProduitCard>
+                    </Grid>
+                ))}
 
-        </Grid>
+            </Grid>
+            <Pagination count={pageTotal} page={pageActuel} onChange={handlePageActuelChange} variant="outlined" shape="rounded" />
+        </Container>
     );
 }

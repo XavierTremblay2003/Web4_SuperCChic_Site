@@ -6,7 +6,7 @@ export const baseAccessTokenName = "supercchic_access_token";
 export const baseUserNameVariableName = "supercchic_user_name"
 const baseRefreshTokenName = "supercchic_refresh_token"
 
-const baseURL = 'http://localhost:8000/';
+export const baseURL = 'http://localhost:8000/';
 const headerToken = 'Bearer ';
 
 const axiosInstance = axios.create({
