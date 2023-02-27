@@ -29,8 +29,15 @@ import {
 } from '@mui/icons-material';
 import { baseUserNameVariableName } from '../DataServices/Axios';
 import Recherche from '../Epicerie/Recherche';
+import { type } from '@testing-library/user-event/dist/type';
 
-function Banner(): JSX.Element {
+type BannerProps = {
+  recherche : string
+  handleSetRecherche : React.Dispatch<React.SetStateAction<string>>
+}
+
+
+function Banner({recherche, handleSetRecherche} : BannerProps): JSX.Element {
   //console.log('Load Banner Component');
 
   const location: Location = useLocation();
@@ -78,7 +85,7 @@ function Banner(): JSX.Element {
           <Typography variant="h6" sx={{ flexGrow: 1 }}>
             Super CChic
           </Typography>
-          <Recherche></Recherche>
+          <Recherche recherche={recherche} handleSetRecherche={handleSetRecherche}></Recherche>
           <Box>
             <Tooltip title={"Ouvrir le menu utilisateur"}>
               <IconButton

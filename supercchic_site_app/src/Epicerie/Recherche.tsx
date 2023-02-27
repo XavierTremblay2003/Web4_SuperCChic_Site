@@ -45,11 +45,16 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
     },
 }));
 
+type RechercheProps = {
+    recherche : string
+    handleSetRecherche : React.Dispatch<React.SetStateAction<string>>
+}
 
+export default function Recherche({recherche, handleSetRecherche} : RechercheProps): JSX.Element {
 
-export default function Recherche(): JSX.Element {
-
-
+    const handleRechercheChange = (e:any) => {
+        handleSetRecherche(e.target.value);
+    }
 
     return (
         <Search>
@@ -58,7 +63,10 @@ export default function Recherche(): JSX.Element {
             </SearchIconWrapper>
             <StyledInputBase
                 placeholder="Recherche..."
-                inputProps={{ 'aria-label': 'search' }}
+                inputProps={{ 'aria-label': 'search'}}
+                onChange={handleRechercheChange}
+                value={recherche}
+                
             />
         </Search>
     )

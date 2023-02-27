@@ -26,7 +26,7 @@ root.render(
       <Routes>
         <Route path="/" element={<ProtectedRoutes />}>
           <Route path="" element={<App />}>
-            <Route path="" element={<ProduitCardControler recherche='allo' /> } />
+            <Route path="" element={<ProduitCardControler /> } />
             <Route path="category/:id" element={<ProduitCardControler />} />
           </Route>
         </Route>
