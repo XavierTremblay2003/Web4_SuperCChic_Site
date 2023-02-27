@@ -30,14 +30,17 @@ import {
 import { baseUserNameVariableName } from '../DataServices/Axios';
 import Recherche from '../Epicerie/Recherche';
 import { type } from '@testing-library/user-event/dist/type';
+import DepartementFiltre from '../Epicerie/DepartementFiltre';
 
 type BannerProps = {
-  recherche : string
-  handleSetRecherche : React.Dispatch<React.SetStateAction<string>>
+  recherche: string
+  handleSetRecherche: React.Dispatch<React.SetStateAction<string>>
+  rechercheDepartement : Number | undefined
+  handleSetRechercheDepardement: React.Dispatch<React.SetStateAction<number | undefined>>
 }
 
 
-function Banner({recherche, handleSetRecherche} : BannerProps): JSX.Element {
+function Banner({ recherche, handleSetRecherche, rechercheDepartement ,handleSetRechercheDepardement}: BannerProps): JSX.Element {
   //console.log('Load Banner Component');
 
   const location: Location = useLocation();
@@ -72,7 +75,7 @@ function Banner({recherche, handleSetRecherche} : BannerProps): JSX.Element {
   }
 
   return (
-    <AppBar sx={{background: "#D8551Eff"}} position="static">
+    <AppBar sx={{ background: "#D8551Eff" }} position="static">
       <Container component="nav">
         <Toolbar>
           {location.pathname !== '/' && (
@@ -82,9 +85,12 @@ function Banner({recherche, handleSetRecherche} : BannerProps): JSX.Element {
               </IconButton>
             </Tooltip>
           )}
-          <Typography variant="h6" sx={{ flexGrow: 1 }}>
-            Super CChic
-          </Typography>
+          <Container sx={{flexgro : 1, flexDirection : "row", display : "flex"}}>
+            <Typography variant="h6">
+              Super CChic
+            </Typography>
+            <DepartementFiltre rechercheDepartement={rechercheDepartement} handleSetRechercheDepardement={handleSetRechercheDepardement}></DepartementFiltre>
+          </Container>
           <Recherche recherche={recherche} handleSetRecherche={handleSetRecherche}></Recherche>
           <Box>
             <Tooltip title={"Ouvrir le menu utilisateur"}>

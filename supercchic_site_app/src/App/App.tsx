@@ -7,15 +7,16 @@ import { useState } from 'react';
 
 function App(): JSX.Element {
   //console.log('Load App Component');
-  const [recherche, SetRecherche] = useState<string>("Allo");
+  const [recherche, SetRecherche] = useState<string>("");
+  const [rechercheDepartement, SetRechercheDepartement] = useState<number>();
 
   return (
     <SnackbarProvider maxSnack={2}>
       <CssBaseline />
-      <Banner recherche={recherche} handleSetRecherche={SetRecherche} />
+      <Banner recherche={recherche} handleSetRecherche={SetRecherche} rechercheDepartement={rechercheDepartement} handleSetRechercheDepardement={SetRechercheDepartement}/>
       <Container component="main">
         <Box padding={3}>
-          <Outlet context={recherche}/>
+          <Outlet context={[recherche, rechercheDepartement]}/>
         </Box>
       </Container>
     </SnackbarProvider>

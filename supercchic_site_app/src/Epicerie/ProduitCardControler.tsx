@@ -13,7 +13,7 @@ import ProduitCard from "./ProduitCard";
 
 
 export default function ProduitCardControler(): JSX.Element {
-    const recherche = useOutletContext<string>();
+    const [recherche, rechercheDepartement] = useOutletContext<[string, Number | undefined]>();
 
     const [produits, setProduits] = useState<Array<IProduitData>>(Array<IProduitData>);
     const [pageActuel, setPageActuel] = useState<number>(1);
@@ -21,18 +21,30 @@ export default function ProduitCardControler(): JSX.Element {
 
 
     useEffect(() => {
-        ProduitDataService.getAllByPage(pageActuel)
-            .then((response) => {
-                setProduits(response.data.results);
-                setPageTotal(Math.ceil(response.data.count / 6));
-            })
-            .catch((err) => {
-                console.log("Erreur de connection a api");
-            })
 
-    }, [pageActuel]);
+        if (rechercheDepartement === undefined) {
+            ProduitDataService.getByFiltreAndPage(pageActuel, recherche)
+                .then((response) => {
+                    setProduits(response.data.results);
+                    setPageTotal(Math.ceil(response.data.count / 6));
+                })
+                .catch((err) => {
+                    console.log("Erreur de connection a api");
+                })
+        } else {
+            ProduitDataService.getByFiltreAndPageAndDepartement(pageActuel, recherche, rechercheDepartement)
+                .then((response) => {
+                    setProduits(response.data.results);
+                    setPageTotal(Math.ceil(response.data.count / 6));
+                })
+                .catch((err) => {
+                    console.log("Erreur de connection a api");
+                })
+        }
 
-    const handlePageActuelChange = (e: any, value : number): void => {
+    }, [pageActuel, recherche, rechercheDepartement]);
+
+    const handlePageActuelChange = (e: any, value: number): void => {
         setPageActuel(value)
     }
 

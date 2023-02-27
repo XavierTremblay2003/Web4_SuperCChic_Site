@@ -1,6 +1,7 @@
 import { styled, alpha } from '@mui/material/styles';
 import SearchIcon from '@mui/icons-material/Search';
 import InputBase from '@mui/material/InputBase';
+import { useState } from 'react';
 
 
 
@@ -52,8 +53,16 @@ type RechercheProps = {
 
 export default function Recherche({recherche, handleSetRecherche} : RechercheProps): JSX.Element {
 
+    const [rechercheText, setRechercheText] = useState<string>("");
+
+    const HandleKeyPress = (e:any) => {
+        if (e.keyCode === 13) {
+            handleSetRecherche(e.target.value);
+        }
+    }
+
     const handleRechercheChange = (e:any) => {
-        handleSetRecherche(e.target.value);
+        setRechercheText(e.target.value);
     }
 
     return (
@@ -64,8 +73,9 @@ export default function Recherche({recherche, handleSetRecherche} : RecherchePro
             <StyledInputBase
                 placeholder="Recherche..."
                 inputProps={{ 'aria-label': 'search'}}
+                onKeyUp={(e) => HandleKeyPress(e)}
                 onChange={handleRechercheChange}
-                value={recherche}
+                value={rechercheText}
                 
             />
         </Search>
