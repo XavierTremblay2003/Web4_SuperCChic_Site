@@ -54,7 +54,7 @@ export default function ProduitCardControler(): JSX.Element {
             <Grid sx={{ display: "flex", alignItems: "center ", justifyContent: "center", mb: 5 }} container spacing={2}>
                 {produits.map((produit) => (
                     <Grid key={produit.id} item xs={8} sm={6} lg={4}>
-                        <ProduitCard produit={produit} ></ProduitCard>
+                        <ProduitCard key={produit.id} produit={produit} ></ProduitCard>
                     </Grid>
                 ))}
 
