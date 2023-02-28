@@ -1,9 +1,10 @@
 import {
   Add as AddIcon,
   AddShoppingCart as AddShoppingCartIcon,
+  AlignHorizontalCenter,
   Remove as RemoveIcon
 } from "@mui/icons-material";
-import { Box, Button, Card, CardActions, CardContent, CardMedia, FormControl, IconButton, TextField, Typography } from "@mui/material";
+import { Alert, Box, Button, Card, CardActions, CardContent, CardMedia, FormControl, IconButton, Snackbar, TextField, Typography } from "@mui/material";
 import { Container } from "@mui/system";
 import * as yup from 'yup';
 import { ChangeEvent, SyntheticEvent, useEffect, useState } from "react";
@@ -12,53 +13,73 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import FormTextField from '../Controls/FormTextField';
 import IProduitData from "../DataInterfaces/IProduitData";
 import { baseURL } from "../DataServices/Axios";
+import FactureDataService from "../DataServices/FactureDataService";
 
-type FormLoginFields = {
-  produitId: Number
+type FormAjoutProduitFields = {
   quantite: Number
 };
 
 type ProduitCardProps = {
-  produit : IProduitData
+  produit: IProduitData
 }
 
-export default function ProduitCard({produit} : ProduitCardProps): JSX.Element {
-  
+export default function ProduitCard({ produit }: ProduitCardProps): JSX.Element {
+  console.log("Produit modifier")
   const [submitWarning, setSubmitWarning] = useState<string>('');
   const [submitError, setSubmitError] = useState<string>('');
 
   const [nombreProduit, setNombreProduit] = useState<number>();
-  
+
+  const [snackBarSucces, setSnackBarSucces] = useState<boolean>(false);
+  const [snackBarEroor, setSnackBarEroor] = useState<boolean>(false);
+
   const formSchema = yup.object().shape({
     quantite: yup
-    .number()
-    .typeError("La quantite doit être un nombre")
-    .min(1,"La quantité ne doit pas être négative")
-    .required("La quantité est obligatoire")
-    .integer("La quantit doit être un entier"),
-    produitId: yup
-    .number()
-    .required()
-    .integer()
+      .number()
+      .typeError("La quantite doit être un nombre")
+      .min(1, "La quantité ne doit pas être négative")
+      .required("La quantité est obligatoire")
+      .integer("La quantit doit être un entier")
   });
 
-  
+  const handleClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setSnackBarSucces(false);
+    setSnackBarEroor(false);
+  };
+
+
   const {
     formState: { errors },
     handleSubmit,
     register,
-  } = useForm<FormLoginFields>({
+    setValue,
+  } = useForm<FormAjoutProduitFields>({
     resolver: yupResolver(formSchema),
   });
-  
-  const handleFormSubmit = (data: FormLoginFields): void => {
+
+  const handleFormSubmit = (data: FormAjoutProduitFields): void => {
     setSubmitWarning('');
-    setSubmitError('');    
+    setSubmitError('');
+
+    let quantite = nombreProduit != undefined ? nombreProduit : 0
+
+    FactureDataService.AddProduitPanier(produit.id, quantite)
+      .then((responce) => {
+        setSnackBarSucces(true);
+      })
+      .catch((err) => {
+        setSnackBarEroor(true);
+      });
+
   }
 
-  const handleQuantiteFieldChange = (e : any) : void => {
+  const handleQuantiteFieldChange = (e: any): void => {
 
-    if(isNaN(Number(e.target.value)) || e.target.value === "") {
+    if (isNaN(Number(e.target.value)) || e.target.value === "") {
       setNombreProduit(undefined);
     } else {
       setNombreProduit(Number(e.target.value));
@@ -71,35 +92,50 @@ export default function ProduitCard({produit} : ProduitCardProps): JSX.Element {
     let nombre = nombreProduit ?? 0
 
     if ((nombre + nombreAAjoute) > 0) {
-      setNombreProduit(nombre + nombreAAjoute)
+      setNombreProduit(nombre + nombreAAjoute);
+      setValue("quantite",nombre + nombreAAjoute)
     }
   }
 
   return (
-    <Card sx={{ maxWidth: 350}}>
-      <CardMedia
-        component="img"
-        image={baseURL + produit.url_image}
-        title="Image du produit"
-        height="350"
-      />
-      <CardContent sx={{ textAlign: "center" }} >
-        <Typography variant="h5" gutterBottom>
-          {produit.nom}
-        </Typography>
-        <Container  sx={{ display: "flex", alignContent: "center", justifyContent: "center", m:1}}>
-        <Typography variant="h6" >Prix: {produit.prix} $</Typography>
-        </Container>
-        <Box component="form" onSubmit={handleSubmit(handleFormSubmit) } >
-          <Container sx={{ display: "flex", alignContent: "center", justifyContent: "center"}}>
-            <IconButton onClick={() => testAjoutProduit(-1)} aria-label="retirerUn"> <RemoveIcon /> </IconButton>
-            <FormTextField onChangeCapture={handleQuantiteFieldChange} registerReturn={register("quantite")} type="tel" value={nombreProduit} sx={{ maxWidth: 75 }}></FormTextField>
-            <IconButton onClick={() => testAjoutProduit(1)} sx={{ alignSelf: "center" }} aria-label="retirerUn"> <AddIcon /> </IconButton>
+    <>
+      <Card sx={{ maxWidth: 350 }}>
+        <CardMedia
+          component="img"
+          image={baseURL + produit.url_image}
+          title="Image du produit"
+          height="350"
+        />
+        <CardContent sx={{ textAlign: "center" }} >
+          <Typography variant="h5" gutterBottom>
+            {produit.nom}
+          </Typography>
+          <Container sx={{ display: "flex", alignContent: "center", justifyContent: "center", m: 1 }}>
+            <Typography variant="h6" >Prix: {produit.prix} $</Typography>
           </Container>
-          <Typography sx={{mb: 2, height : 12}} color="Red">{errors.quantite?.message}</Typography>
-          <Button type="submit" sx={{ background: "#FFEE00ff", color: "black", ":hover": { bgcolor: "#FFEE00AA" } }} variant="contained" size="medium" startIcon={<AddShoppingCartIcon />}>Ajouté au panier</Button>
-        </Box>
-      </CardContent>
-    </Card>
+          <Box component="form" onSubmit={handleSubmit(handleFormSubmit)} >
+            <Container sx={{ display: "flex", alignContent: "center", justifyContent: "center" }}>
+              <IconButton onClick={() => testAjoutProduit(-1)} aria-label="retirerUn"> <RemoveIcon /> </IconButton>
+              <FormTextField onChangeCapture={handleQuantiteFieldChange} registerReturn={register("quantite")} type="number" value={nombreProduit} sx={{ maxWidth: 75 }}></FormTextField>
+              <IconButton onClick={() => testAjoutProduit(1)} sx={{ alignSelf: "center" }} aria-label="retirerUn"> <AddIcon /> </IconButton>
+            </Container>
+            <Typography sx={{ mb: 2, height: 12 }} color="Red">{errors.quantite?.message}</Typography>
+            <Button type="submit" sx={{ background: "#FFEE00ff", color: "black", ":hover": { bgcolor: "#FFEE00AA" } }} variant="contained" size="medium" startIcon={<AddShoppingCartIcon />}>Ajouté au panier</Button>
+          </Box>
+        </CardContent>
+      </Card>
+
+      <Snackbar open={snackBarSucces} autoHideDuration={6000} onClose={handleClose}>
+        <Alert severity="success" sx={{ width: '100%' }}>
+          Le produit a été ajouter avec succès
+        </Alert>
+      </Snackbar>
+
+      <Snackbar  open={snackBarEroor} autoHideDuration={6000} onClose={handleClose}>
+        <Alert severity="error" sx={{ width: '100%' }}>
+          Un erreur est survenue lors de l'ajout du produit
+        </Alert>
+      </Snackbar>
+    </>
   );
 }

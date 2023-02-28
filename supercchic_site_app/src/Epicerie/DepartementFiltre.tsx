@@ -67,7 +67,7 @@ export default function DepartementFiltre({rechercheDepartement, handleSetRecher
                 TransitionComponent={Fade}
             >
                 {departements.map((dep) => {
-                    return <MenuItem onClick={() => handleClose(dep.id)}>{dep.nom}</MenuItem>
+                    return <MenuItem key={dep.id} onClick={() => handleClose(dep.id)}>{dep.nom}</MenuItem>
                 }) }
             </Menu>
         </>

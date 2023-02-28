@@ -25,7 +25,9 @@ import {
   ArrowBack as ArrowBackIcon,
   InfoOutlined as InfoOutlinedIcon,
   Logout as LogoutIcon,
+  Login as LoginIcon,
   PersonOutlineOutlined as PersonOutlineOutlinedIcon,
+  LocalGroceryStoreRounded as LocalGroceryStoreRoundedIcon,
 } from '@mui/icons-material';
 import { baseUserNameVariableName } from '../DataServices/Axios';
 import Recherche from '../Epicerie/Recherche';
@@ -35,12 +37,12 @@ import DepartementFiltre from '../Epicerie/DepartementFiltre';
 type BannerProps = {
   recherche: string
   handleSetRecherche: React.Dispatch<React.SetStateAction<string>>
-  rechercheDepartement : Number | undefined
+  rechercheDepartement: Number | undefined
   handleSetRechercheDepardement: React.Dispatch<React.SetStateAction<number | undefined>>
 }
 
 
-function Banner({ recherche, handleSetRecherche, rechercheDepartement ,handleSetRechercheDepardement}: BannerProps): JSX.Element {
+function Banner({ recherche, handleSetRecherche, rechercheDepartement, handleSetRechercheDepardement }: BannerProps): JSX.Element {
   //console.log('Load Banner Component');
 
   const location: Location = useLocation();
@@ -50,6 +52,10 @@ function Banner({ recherche, handleSetRecherche, rechercheDepartement ,handleSet
 
   const handleGoHomeClick = (): void => {
     navigate('/');
+  }
+
+  const handleGoCarsClick = (): void => {
+    navigate('/panier');
   }
 
   const handleOpenUserMenu = (e: React.MouseEvent<HTMLElement>) => {
@@ -74,6 +80,11 @@ function Banner({ recherche, handleSetRecherche, rechercheDepartement ,handleSet
     navigate('/auth/logout');
   }
 
+  const handleLoginClick = (): void => {
+    setUserAnchorEl(null);
+    navigate('/auth/login');
+  }
+
   return (
     <AppBar sx={{ background: "#D8551Eff" }} position="static">
       <Container component="nav">
@@ -85,13 +96,18 @@ function Banner({ recherche, handleSetRecherche, rechercheDepartement ,handleSet
               </IconButton>
             </Tooltip>
           )}
-          <Container sx={{flexgro : 1, flexDirection : "row", display : "flex"}}>
+          <Container sx={{ flexgro: 1, flexDirection: "row", display: "flex" }}>
             <Typography variant="h6">
               Super CChic
             </Typography>
             <DepartementFiltre rechercheDepartement={rechercheDepartement} handleSetRechercheDepardement={handleSetRechercheDepardement}></DepartementFiltre>
           </Container>
           <Recherche recherche={recherche} handleSetRecherche={handleSetRecherche}></Recherche>
+          <Tooltip title="Accéder aux panier">
+            <IconButton onClick={handleGoCarsClick}>
+              <LocalGroceryStoreRoundedIcon sx={{ color: "white" }} fontSize="large" />
+            </IconButton>
+          </Tooltip>
           <Box>
             <Tooltip title={"Ouvrir le menu utilisateur"}>
               <IconButton
@@ -121,68 +137,41 @@ function Banner({ recherche, handleSetRecherche, rechercheDepartement ,handleSet
               }}
             >
               {localStorage.getItem(baseUserNameVariableName) ? (
-                <MenuItem sx={{ py: '4px' }}>
-                  <ListItemIcon>
-                    <PersonOutlineOutlinedIcon fontSize="small" />
-                  </ListItemIcon>
-                  <ListItemText>
-                    <Typography sx={{ fontSize: '0.95rem' }}>
-                      {localStorage.getItem(baseUserNameVariableName)}
-                    </Typography>
-                  </ListItemText>
-                </MenuItem>
+                <>
+                  <MenuItem sx={{ py: '4px' }}>
+                    <ListItemIcon>
+                      <PersonOutlineOutlinedIcon fontSize="small" />
+                    </ListItemIcon>
+                    <ListItemText>
+                      <Typography sx={{ fontSize: '0.95rem' }}>
+                        {localStorage.getItem(baseUserNameVariableName)}
+                      </Typography>
+                    </ListItemText>
+                  </MenuItem>
+                  <Divider />
+                  <MenuItem onClick={handleLogoutClick} sx={{ py: '4px' }}>
+                    <ListItemIcon>
+                      <LogoutIcon fontSize="small" />
+                    </ListItemIcon>
+                    <ListItemText>
+                      <Typography sx={{ fontSize: '0.95rem' }}>{"Se déconnecter"}</Typography>
+                    </ListItemText>
+                  </MenuItem>
+                </>
               ) : (
-                <span />
+                <MenuItem onClick={handleLoginClick} sx={{ py: '4px' }}>
+                    <ListItemIcon>
+                      <LogoutIcon fontSize="small" />
+                    </ListItemIcon>
+                    <ListItemText>
+                      <Typography sx={{ fontSize: '0.95rem' }}>{"Se Connectée"}</Typography>
+                    </ListItemText>
+                  </MenuItem>
               )}
-              <MenuItem onClick={handleOpenAbout} sx={{ py: '4px' }}>
-                <ListItemIcon>
-                  <InfoOutlinedIcon fontSize="small" />
-                </ListItemIcon>
-                <ListItemText>
-                  <Typography sx={{ fontSize: '0.95rem' }}>À propos</Typography>
-                </ListItemText>
-              </MenuItem>
-              <Divider />
-              <MenuItem onClick={handleLogoutClick} sx={{ py: '4px' }}>
-                <ListItemIcon>
-                  <LogoutIcon fontSize="small" />
-                </ListItemIcon>
-                <ListItemText>
-                  <Typography sx={{ fontSize: '0.95rem' }}>{"Se déconnecter"}</Typography>
-                </ListItemText>
-              </MenuItem>
             </Menu>
           </Box>
         </Toolbar>
       </Container>
-      <Dialog
-        aria-describedby="about-dialog-description"
-        aria-labelledby="about-dialog-title"
-        onClose={handleCloseAbout}
-        open={aboutOpen}
-      >
-        <DialogTitle id="about-dialog-title">À propos</DialogTitle>
-        <Divider />
-        <DialogContent>
-          <DialogContentText id="about-dialog-description" variant="body2" textAlign="justify">
-            Rogatus ad ultimum admissusque in consistorium ambage nulla praegressa inconsiderate
-            et leviter proficiscere inquit ut praeceptum est, Caesar sciens quod si cessaveris,
-            et tuas et palatii tui auferri iubebo prope diem annonas. hocque solo contumaciter
-            dicto subiratus abscessit nec in conspectum eius postea venit saepius arcessitus.
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions sx={{ pb: 2, pr: 3 }}>
-          <Button
-            autoFocus
-            color="primary"
-            onClick={handleCloseAbout}
-            size="small"
-            variant="outlined"
-          >
-            OK
-          </Button>
-        </DialogActions>
-      </Dialog>
     </AppBar>
   );
 }
