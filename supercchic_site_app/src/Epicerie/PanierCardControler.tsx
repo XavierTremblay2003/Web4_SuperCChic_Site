@@ -32,7 +32,7 @@ export default function PnierCardControler(): JSX.Element {
             <Typography sx={{ mb: 2 }} variant="h3">Votre panier</Typography>
 
             {facture?.produit_factures?.map((produitFacture) => (
-                <PanierCard key={produitFacture.id} produit={produitFacture.produit} />
+                <PanierCard key={produitFacture.id} produitFacture={produitFacture} />
             ))}
         </Container>
     )

@@ -33,6 +33,7 @@ import { baseUserNameVariableName } from '../DataServices/Axios';
 import Recherche from '../Epicerie/Recherche';
 import { type } from '@testing-library/user-event/dist/type';
 import DepartementFiltre from '../Epicerie/DepartementFiltre';
+import MoreIcon from '@mui/icons-material/MoreVert';
 
 type BannerProps = {
   recherche: string
@@ -49,6 +50,7 @@ function Banner({ recherche, handleSetRecherche, rechercheDepartement, handleSet
   const navigate: NavigateFunction = useNavigate();
   const [aboutOpen, setAboutOpen] = useState<boolean>(false);
   const [userAnchorEl, setUserAnchorEl] = React.useState<HTMLElement | null>(null);
+  const [menuAnchorEl, setMenuAnchorEl] = React.useState<HTMLElement | null>(null);
 
   const handleGoHomeClick = (): void => {
     navigate('/');
@@ -60,19 +62,19 @@ function Banner({ recherche, handleSetRecherche, rechercheDepartement, handleSet
 
   const handleOpenUserMenu = (e: React.MouseEvent<HTMLElement>) => {
     setUserAnchorEl(e.currentTarget);
+    setMenuAnchorEl(null);
   }
 
   const handleCloseUserMenu = () => {
     setUserAnchorEl(null);
   }
 
-  const handleOpenAbout = (): void => {
-    setUserAnchorEl(null);
-    setAboutOpen(true);
+  const handleOpenMenu = (e: React.MouseEvent<HTMLElement>) => {
+    setMenuAnchorEl(e.currentTarget);
   }
 
-  const handleCloseAbout = (): void => {
-    setAboutOpen(false);
+  const handleCloseMenu = () => {
+    setMenuAnchorEl(null);
   }
 
   const handleLogoutClick = (): void => {
@@ -84,6 +86,71 @@ function Banner({ recherche, handleSetRecherche, rechercheDepartement, handleSet
     setUserAnchorEl(null);
     navigate('/auth/login');
   }
+
+  const renderMenuSmall = (
+    <Menu
+      anchorEl={menuAnchorEl}
+      anchorOrigin={{
+        vertical: 'top',
+        horizontal: 'right',
+      }}
+      id="menu-appbar"
+      keepMounted
+      onClose={handleCloseMenu}
+      open={Boolean(menuAnchorEl)}
+      sx={{ mt: '30px' }}
+      transformOrigin={{
+        vertical: 'top',
+        horizontal: 'right',
+      }}
+    >
+      {localStorage.getItem(baseUserNameVariableName) ? (
+        <>
+          <MenuItem>
+            <ListItemIcon>
+              <PersonOutlineOutlinedIcon fontSize="small" />
+            </ListItemIcon>
+            <ListItemText>
+              <Typography>
+                {localStorage.getItem(baseUserNameVariableName)}
+              </Typography>
+            </ListItemText>
+          </MenuItem>
+          <Divider />
+          <MenuItem onClick={handleLogoutClick}>
+            <ListItemIcon>
+              <LogoutIcon fontSize="small" />
+            </ListItemIcon>
+            <ListItemText>
+              <Typography>{"Se déconnecter"}</Typography>
+            </ListItemText>
+          </MenuItem>
+        </>
+      ) : (
+        <MenuItem onClick={handleLoginClick}>
+          <ListItemIcon>
+            <LogoutIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>
+            <Typography>{"Se Connectée"}</Typography>
+          </ListItemText>
+        </MenuItem>
+      )}
+      <Divider />
+      <MenuItem onClick={handleGoCarsClick}>
+        <ListItemIcon>
+          <LocalGroceryStoreRoundedIcon sx={{ color: 'black' }} fontSize="small" />
+        </ListItemIcon>
+        <Typography>
+          Panier
+        </Typography>
+      </MenuItem>
+      <Divider />
+      <MenuItem>
+        <Recherche recherche={recherche} handleSetRecherche={handleSetRecherche}></Recherche>
+      </MenuItem>
+    </Menu>
+  )
 
   return (
     <AppBar sx={{ background: "#D8551Eff" }} position="static">
@@ -102,13 +169,13 @@ function Banner({ recherche, handleSetRecherche, rechercheDepartement, handleSet
             </Typography>
             <DepartementFiltre rechercheDepartement={rechercheDepartement} handleSetRechercheDepardement={handleSetRechercheDepardement}></DepartementFiltre>
           </Container>
-          <Recherche recherche={recherche} handleSetRecherche={handleSetRecherche}></Recherche>
-          <Tooltip title="Accéder aux panier">
-            <IconButton onClick={handleGoCarsClick}>
-              <LocalGroceryStoreRoundedIcon sx={{ color: "white" }} fontSize="large" />
-            </IconButton>
-          </Tooltip>
-          <Box>
+          <Box sx={{ display: { xs: "none", md: "flex" } }}>
+            <Recherche recherche={recherche} handleSetRecherche={handleSetRecherche}></Recherche>
+            <Tooltip title="Accéder aux panier">
+              <IconButton onClick={handleGoCarsClick}>
+                <LocalGroceryStoreRoundedIcon sx={{ color: "white" }} fontSize="large" />
+              </IconButton>
+            </Tooltip>
             <Tooltip title={"Ouvrir le menu utilisateur"}>
               <IconButton
                 aria-controls="user-menu-appbar"
@@ -160,18 +227,30 @@ function Banner({ recherche, handleSetRecherche, rechercheDepartement, handleSet
                 </>
               ) : (
                 <MenuItem onClick={handleLoginClick} sx={{ py: '4px' }}>
-                    <ListItemIcon>
-                      <LogoutIcon fontSize="small" />
-                    </ListItemIcon>
-                    <ListItemText>
-                      <Typography sx={{ fontSize: '0.95rem' }}>{"Se Connectée"}</Typography>
-                    </ListItemText>
-                  </MenuItem>
+                  <ListItemIcon>
+                    <LogoutIcon fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText>
+                    <Typography sx={{ fontSize: '0.95rem' }}>{"Se Connectée"}</Typography>
+                  </ListItemText>
+                </MenuItem>
               )}
             </Menu>
           </Box>
+          <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
+            <IconButton
+              size="large"
+              aria-label="show more"
+              aria-haspopup="true"
+              onClick={handleOpenMenu}
+              color="inherit"
+            >
+              <MoreIcon />
+            </IconButton>
+          </Box>
         </Toolbar>
       </Container>
+      {renderMenuSmall}
     </AppBar>
   );
 }

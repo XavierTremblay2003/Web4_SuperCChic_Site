@@ -66,7 +66,7 @@ export default function Recherche({recherche, handleSetRecherche} : RecherchePro
     }
 
     return (
-        <Search>
+        <Search sx={{height : 40 , mt : {xs : 0, md : 1  }, m : {xs : 0}}}>
             <SearchIconWrapper>
                 <SearchIcon />
             </SearchIconWrapper>
