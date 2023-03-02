@@ -42,7 +42,7 @@ export default function ProduitCard({ produit }: ProduitCardProps): JSX.Element 
           <Container sx={{ display: "flex", alignContent: "center", justifyContent: "center", m: 1 }}>
             <Typography variant="h6" >Prix: {produit.prix} $</Typography>
           </Container>
-          <ProduitForm autoSubmit={false} readonly={false} produit={produit}></ProduitForm>
+          <ProduitForm produit={produit}></ProduitForm>
         </CardContent>
       </Card>
     </>

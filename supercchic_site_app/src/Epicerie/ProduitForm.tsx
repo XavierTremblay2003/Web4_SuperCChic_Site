@@ -17,18 +17,13 @@ import FactureDataService from "../DataServices/FactureDataService";
 
 type ProduitFormProp = {
     produit: IProduitData
-    readonly: boolean
-    autoSubmit : boolean
 }
 
 type FormAjoutProduitFields = {
     quantite: Number
 };
 
-export default function ProduitForm({ produit, readonly, autoSubmit }: ProduitFormProp): JSX.Element {
-
-    const [submitWarning, setSubmitWarning] = useState<string>('');
-    const [submitError, setSubmitError] = useState<string>('');
+export default function ProduitForm({ produit }: ProduitFormProp): JSX.Element {
 
     const [nombreProduit, setNombreProduit] = useState<number>();
 
@@ -64,8 +59,6 @@ export default function ProduitForm({ produit, readonly, autoSubmit }: ProduitFo
     });
 
     const handleFormSubmit = (data: FormAjoutProduitFields): void => {
-        setSubmitWarning('');
-        setSubmitError('');
 
         let quantite = nombreProduit != undefined ? nombreProduit : 0
 
@@ -103,11 +96,11 @@ export default function ProduitForm({ produit, readonly, autoSubmit }: ProduitFo
         <Box component="form" onSubmit={handleSubmit(handleFormSubmit)} >
             <Container sx={{ display: "flex", alignContent: "center", justifyContent: "center" }}>
                 <IconButton onClick={() => testAjoutProduit(-1)} aria-label="retirerUn"> <RemoveIcon /> </IconButton>
-                <FormTextField onChangeCapture={handleQuantiteFieldChange} registerReturn={register("quantite")} sx={{ maxWidth: 75 }} InputProps={{ readOnly: readonly }} value={nombreProduit}></FormTextField>
+                <FormTextField onChangeCapture={handleQuantiteFieldChange} inputProps={{style: { textAlign: 'center' }}} registerReturn={register("quantite")} sx={{ maxWidth: 75 }} value={nombreProduit}></FormTextField>
                 <IconButton onClick={() => testAjoutProduit(1)} sx={{ alignSelf: "center" }} aria-label="retirerUn"> <AddIcon /> </IconButton>
             </Container>
             <Typography sx={{ mb: 2, height: 12 }} color="Red">{errors.quantite?.message}</Typography>
-            { !autoSubmit && <Button type="submit" sx={{ background: "#FFEE00ff", color: "black", ":hover": { bgcolor: "#FFEE00AA" } }} variant="contained" size="medium" startIcon={<AddShoppingCartIcon />}>Ajouté au panier</Button>}
+            <Button type="submit" sx={{ background: "#FFEE00ff", color: "black", ":hover": { bgcolor: "#FFEE00AA" } }} variant="contained" size="medium" startIcon={<AddShoppingCartIcon />}>Ajouté au panier</Button>
 
             <Snackbar open={snackBarSucces} autoHideDuration={1200} onClose={handleClose}>
                 <Alert severity="success" sx={{ width: '100%' }}>
