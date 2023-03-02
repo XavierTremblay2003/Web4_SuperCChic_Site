@@ -17,7 +17,7 @@ import NotFound from './NotFound';
 import ProduitCard from './Epicerie/ProduitCard';
 import ProduitCardControler from './Epicerie/ProduitCardControler';
 import PanierCard from './Epicerie/PanieCard';
-import PnierCardControler from './Epicerie/PanierCardControler';
+import PanierCardControler from './Epicerie/PanierCardControler';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -29,7 +29,7 @@ root.render(
         <Route path="/" element={<App />}>
           <Route path="" element={<ProduitCardControler />} />
           <Route path="/panier" element={<ProtectedRoutes />}>
-            <Route path="" element={<PnierCardControler />}/>
+            <Route path="" element={<PanierCardControler />}/>
           </Route>
         </Route>
         <Route path="/auth" element={<AuthRoutes />}>

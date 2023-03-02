@@ -23,7 +23,6 @@ type ProduitFormProp = {
 
 export default function PanierForm({ produitFacture, handleModifieProduit }: ProduitFormProp): JSX.Element {
 
-
     return (
         <Box component="form">
             <Container sx={{ display: "flex", alignContent: "center", justifyContent: "center" }}>

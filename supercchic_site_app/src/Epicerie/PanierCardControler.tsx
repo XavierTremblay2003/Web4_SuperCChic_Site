@@ -1,4 +1,4 @@
-import { Typography } from "@mui/material";
+import { Button, Typography } from "@mui/material";
 import { Container } from "@mui/system";
 import { response } from "express";
 import { useEffect, useRef, useState } from "react";
@@ -10,7 +10,7 @@ import PanierCard from "./PanieCard";
 
 
 
-export default function PnierCardControler(): JSX.Element {
+export default function PanierCardControler(): JSX.Element {
 
     const [facture, setFacture] = useState<IfactureData>();
     const [factureModifie, setFactureModifie] = useState<boolean>(true);
@@ -91,6 +91,22 @@ export default function PnierCardControler(): JSX.Element {
             })
     }
 
+    const calculetotalFacture = () => {
+
+        let total = 0.00;
+        facture?.produit_factures.forEach((produiFacture) => {
+            total += Number(produiFacture.prix_total);
+        });
+
+        let formatter = new Intl.NumberFormat("fr-ca", {
+            style : "currency",
+            currency : "CAD"
+        })
+
+        return formatter.format(total);
+
+    }
+
 
 
 
@@ -101,6 +117,9 @@ export default function PnierCardControler(): JSX.Element {
             {facture?.produit_factures?.map((produitFacture) => (
                 <PanierCard handleSuprimerProduit={suprimerProduit} handleModifieProduit={modifierUnProduit} key={produitFacture.id} produitFacture={produitFacture} />
             ))}
+
+            <Typography variant="h5" sx={{ mb : 1 }}>Total : {calculetotalFacture()}</Typography>
+            <Button variant="contained"  sx={{ background: "#FFEE00ff", color: "black", ":hover": { bgcolor: "#FFEE00AA" }, width : 250 }}>Commender</Button>
         </Container>
     )
 }

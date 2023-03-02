@@ -24,6 +24,10 @@ type PanierCardProps = {
 
 export default function PanierCard({ produitFacture, handleModifieProduit,handleSuprimerProduit }: PanierCardProps): JSX.Element {
 
+    const formatter = new Intl.NumberFormat("fr-ca", {
+        style : "currency",
+        currency : "CAD"
+    })
 
     return (
         <Grid container sx={{ border: 1, m: 1 }}>
@@ -41,7 +45,7 @@ export default function PanierCard({ produitFacture, handleModifieProduit,handle
                 <PanierForm handleModifieProduit={handleModifieProduit} produitFacture={produitFacture} ></PanierForm>
             </Grid>
             <Grid xs={12} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }} item sm={12} md={2}>
-                <Typography variant="h5">{produitFacture.prix_total} $</Typography>
+                <Typography variant="h5">{formatter.format(produitFacture.prix_total)}</Typography>
             </Grid>
             <Grid xs={12} sm={12} item md={1} sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
                 <IconButton sx={{ background : "black", color : "white", ':hover' : {bgcolor : "white", color : "black"} }} onClick={() => handleSuprimerProduit(produitFacture.id)} aria-label="delete">

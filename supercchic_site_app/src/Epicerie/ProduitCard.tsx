@@ -26,6 +26,12 @@ type ProduitCardProps = {
 
 export default function ProduitCard({ produit }: ProduitCardProps): JSX.Element {
 
+  const formatter = new Intl.NumberFormat("fr-ca", {
+    style: "currency",
+    currency: "CAD"
+  })
+
+
   return (
     <>
       <Card sx={{ maxWidth: 350 }}>
@@ -40,7 +46,7 @@ export default function ProduitCard({ produit }: ProduitCardProps): JSX.Element 
             {produit.nom}
           </Typography>
           <Container sx={{ display: "flex", alignContent: "center", justifyContent: "center", m: 1 }}>
-            <Typography variant="h6" >Prix: {produit.prix} $</Typography>
+            <Typography variant="h6" >Prix: {formatter.format(produit.prix)}</Typography>
           </Container>
           <ProduitForm produit={produit}></ProduitForm>
         </CardContent>
