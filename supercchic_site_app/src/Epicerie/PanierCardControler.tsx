@@ -14,22 +14,20 @@ import PanierCard from "./PanieCard";
 export default function PanierCardControler(): JSX.Element {
 
     const [facture, setFacture] = useState<IfactureData>();
-    const [factureModifie, setFactureModifie] = useState<boolean>(true);
 
     const [open, setOpen] = useState(false);
 
+    const [refresh, setRefresh] = useState(0)
+
     useEffect(() => {
-        if (factureModifie) {
-            setFactureModifie(false);
-            FactureDataService.GetFactureEnCours()
-                .then((response) => {
-                    setFacture(response.data);
-                })
-                .catch((err) => {
-                    console.log("Erreur de connection a api");
-                })
-        }
-    }, [factureModifie]);
+        FactureDataService.GetFactureEnCours()
+            .then((response) => {
+                setFacture(response.data);
+            })
+            .catch((err) => {
+                console.log("Erreur de connection a api");
+            })
+    }, []);
 
     const modifierUnProduit = (idProduitFacture: number, nombreProduit: number) => {
 
@@ -99,6 +97,7 @@ export default function PanierCardControler(): JSX.Element {
     };
     const handleClose = () => {
         setOpen(false);
+        window.location.reload();
     };
 
     const calculetotalFacture = () => {
@@ -124,12 +123,16 @@ export default function PanierCardControler(): JSX.Element {
         <Container sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
             <Typography sx={{ mb: 2 }} variant="h3">Votre panier</Typography>
 
-            {facture?.produit_factures?.map((produitFacture) => (
-                <PanierCard handleSuprimerProduit={suprimerProduit} handleModifieProduit={modifierUnProduit} key={produitFacture.id} produitFacture={produitFacture} />
-            ))}
+            {facture?.produit_factures.length != 0 ?
+                facture?.produit_factures?.map((produitFacture) => (
+                    <PanierCard handleSuprimerProduit={suprimerProduit} handleModifieProduit={modifierUnProduit} key={produitFacture.id} produitFacture={produitFacture} />
+                )) : <Typography variant="h4">Le panier est vide</Typography>}
 
-            <Typography variant="h5" sx={{ mb: 1 }}>Total : {calculetotalFacture()}</Typography>
-            <Button variant="contained" onClick={handleClickOpen} sx={{ background: "#FFEE00ff", color: "black", ":hover": { bgcolor: "#FFEE00AA" }, width: 250 }}>Commander</Button>
+            {facture?.produit_factures.length != 0 &&
+                <>
+                    <Typography variant="h5" sx={{ mb: 1 }}>Total : {calculetotalFacture()}</Typography>
+                    <Button variant="contained" onClick={handleClickOpen} sx={{ background: "#FFEE00ff", color: "black", ":hover": { bgcolor: "#FFEE00AA" }, width: 250 }}>Commander</Button>
+                </>}
 
             <Dialog
                 fullWidth={true}
@@ -137,7 +140,7 @@ export default function PanierCardControler(): JSX.Element {
                 open={open}
                 onClose={handleClose}
             >
-                <Facture produitFacture={facture?.produit_factures} total={calculetotalFacture()} handleClose={handleClose}></Facture>
+                <Facture handleSetFacture={setFacture} produitFacture={facture?.produit_factures} total={calculetotalFacture()} handleClose={handleClose}></Facture>
             </Dialog>
 
         </Container>

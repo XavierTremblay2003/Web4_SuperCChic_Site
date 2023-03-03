@@ -16,11 +16,15 @@ const DeleteProduitPanier = (idProduitFacture : number) : Promise<AxiosResponse<
 const GetFactureEnCours = () : Promise<AxiosResponse<IfactureData>> =>
   axiosInstance.get<unknown,AxiosResponse<IfactureData>>(`${rootPath}/get_facture_actuel/`); 
 
+const FinishFacture = () : Promise<AxiosResponse<string>> =>
+  axiosInstance.post<unknown, AxiosResponse<string>>(`${rootPath}/payer_facture_actuel/`);
+
 const FactureDataService = {
     AddProduitPanier,
     EditProduitPanier,
     DeleteProduitPanier,
     GetFactureEnCours,
+    FinishFacture,
 }
 
 export default FactureDataService;

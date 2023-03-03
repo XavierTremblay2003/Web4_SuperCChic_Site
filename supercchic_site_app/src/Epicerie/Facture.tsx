@@ -5,15 +5,71 @@ import { useEffect, useState } from "react";
 import IApiAdresseData from "../DataInterfaces/IApiAdresseData";
 import IProduitFactureData from "../DataInterfaces/IProduitFactureData";
 import AdressCompletDataService from "../DataServices/AdressCompletDataService";
+import { useForm, UseFormRegisterReturn } from "react-hook-form";
+import * as yup from 'yup';
+import { yupResolver } from "@hookform/resolvers/yup";
+import FormTextField from "../Controls/FormTextField";
+import FactureDataService from "../DataServices/FactureDataService";
+import IfactureData from "../DataInterfaces/IFactureData";
+
 
 type FactureProps = {
     handleClose: () => void
+    handleSetFacture : React.Dispatch<React.SetStateAction<IfactureData | undefined>>
     produitFacture: IProduitFactureData[] | undefined
     total: string
 }
 
+type FormPayerFacture = {
+    numerotDeCarte: string,
+    nomDeCarte : string,
+    dateExpiration : string,
+    codeSecurite : number
+    adress : string
+};
 
-export default function Facture({ handleClose, produitFacture, total }: FactureProps): JSX.Element {
+const formSchema = yup.object().shape({
+    numerotDeCarte : yup
+        .number()
+        .typeError("Le numerot de carte ne contien pas de lettre")
+        .required("le numérot de la carte est obligatoire")
+        .integer("Le numerot de carte ne contien pas de lettre"),
+    nomDeCarte : yup
+        .string()
+        .required("Le nom sur la carte est obligatoire"),
+    dateExpiration : yup
+        .string()
+        .required("La date d'expiration est obligatoire"),
+    codeSecurite : yup
+    .number()
+    .typeError("Le code de sécurite ne contien pas de lettre")
+    .required("Le code de sécurité est obligatoire")
+    .integer("Le code de sécurite ne contien pas de lettre"),
+    adress : yup
+    .string()
+    .required("L'adress est obligatoire")
+});
+
+export default function Facture({ handleClose, produitFacture, total,handleSetFacture }: FactureProps): JSX.Element {
+
+    const {
+        formState: { errors },
+        handleSubmit,
+        register,
+    } = useForm<FormPayerFacture>({
+        resolver: yupResolver(formSchema),
+    });
+
+    const handleFormSubmit = (data: FormPayerFacture): void => {
+        FactureDataService.FinishFacture()
+            .then((responce) =>{
+                handleSetFacture(undefined);
+                handleClose();
+            })
+            .catch((err) => {
+                console.log("Erreur de connection a api");
+            })
+    }
 
 
     const [adressComplet, setAdressComplet] = useState<string>("");
@@ -43,33 +99,33 @@ export default function Facture({ handleClose, produitFacture, total }: FactureP
     }
 
     return (
-        <>
+        <Box component="form" onSubmit={handleSubmit(handleFormSubmit)}>
             <DialogTitle>
                 <Typography variant="h4">Facture</Typography>
             </DialogTitle>
-            <Grid spacing={1} container>
+            <Grid spacing={1} container >
                 <Grid sx={{ m: 2, textAlign: "center" }} xs={6} item>
                     <Box border={1} sx={{ p: 2 }}>
                         <Typography sx={{ mb: 1 }} variant="h5">Information de payment</Typography>
                         <Container sx={{ width: "100%" }} component="form">
-                            <TextField fullWidth sx={{ mb: 1 }} label="Numérot de la carte"></TextField>
-                            <TextField fullWidth sx={{ mb: 1 }} label="Nom sur la carte"></TextField>
+                            <FormTextField errorText={errors.numerotDeCarte?.message} registerReturn={register("numerotDeCarte")} fullWidth sx={{ mb: 2 }} label="Numérot de la carte"></FormTextField>
+                            <FormTextField errorText={errors.nomDeCarte?.message} registerReturn={register("nomDeCarte")} fullWidth sx={{ mb: 2 }} label="Nom sur la carte"></FormTextField>
                             <Box sx={{ width: "100%", display: "flex", justifyContent: "space-between" }}>
-                                <TextField sx={{ alignSelf: "flex-start" }} label="Date d'expiration"></TextField>
-                                <TextField sx={{ alignSelf: "flex-end" }} label="Code de sécurite"></TextField>
-                            </Box>
+                                <FormTextField errorText={errors.dateExpiration?.message} registerReturn={register("dateExpiration")} sx={{ alignSelf: "flex-start" }} label="Date d'expiration"></FormTextField>
+                                <FormTextField errorText={errors.codeSecurite?.message} registerReturn={register("codeSecurite")} sx={{ alignSelf: "flex-end" }} label="Code de sécurite"></FormTextField>
+                            </Box>      
                         </Container>
                     </Box>
                     <Box border={1} sx={{ p: 2, mt: 1 }}>
                         <Typography sx={{ mb: 1 }} variant="h5">Information de Livraison</Typography>
                         <Container>
-                            <TextField label="Adress" fullWidth />
+                            <FormTextField errorText={errors.adress?.message} registerReturn={register("adress")} label="Adress" fullWidth />
                         </Container>
                     </Box>
                 </Grid>
                 <Grid xs={5} sx={{ m: 2, textAlign: "center" }} item >
-                    <Box border={1} sx={{ p: 2, display: "flex", flexDirection: "column", width: "100%", height: "100%", justifyContent : "space-between" }}>
-                        <Container sx={{ alignSelf : "flex-start" }}>
+                    <Box border={1} sx={{ p: 2, display: "flex", flexDirection: "column", width: "100%", height: "100%", justifyContent: "space-between" }}>
+                        <Container sx={{ alignSelf: "flex-start" }}>
                             <Typography sx={{ mb: 1 }} variant="h5">Facture</Typography>
 
                             {produitFacture?.map((prodFacture) => {
@@ -87,10 +143,10 @@ export default function Facture({ handleClose, produitFacture, total }: FactureP
                 </Grid>
             </Grid>
             <DialogActions sx={{ display: "flex", justifyContent: "center" }}>
-                <Button autoFocus sx={{ background: "#FFEE00ff", color: "black", ":hover": { bgcolor: "#FFEE00AA" }, width: 250 }} onClick={handleClose}>
+                <Button type="submit" autoFocus sx={{ background: "#FFEE00ff", color: "black", ":hover": { bgcolor: "#FFEE00AA" }, width: 250 }}>
                     Payer
                 </Button>
             </DialogActions>
-        </>
+        </Box>
     )
 }
