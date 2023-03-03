@@ -14,6 +14,7 @@ import FormTextField from '../Controls/FormTextField';
 import IProduitData from "../DataInterfaces/IProduitData";
 import { baseURL } from "../DataServices/Axios";
 import FactureDataService from "../DataServices/FactureDataService";
+import { useSnackbar } from "notistack";
 
 type ProduitFormProp = {
     produit: IProduitData
@@ -26,9 +27,7 @@ type FormAjoutProduitFields = {
 export default function ProduitForm({ produit }: ProduitFormProp): JSX.Element {
 
     const [nombreProduit, setNombreProduit] = useState<number>();
-
-    const [snackBarSucces, setSnackBarSucces] = useState<boolean>(false);
-    const [snackBarEroor, setSnackBarEroor] = useState<boolean>(false);
+    const { enqueueSnackbar } = useSnackbar();
 
     const formSchema = yup.object().shape({
         quantite: yup
@@ -38,15 +37,6 @@ export default function ProduitForm({ produit }: ProduitFormProp): JSX.Element {
             .required("La quantité est obligatoire")
             .integer("La quantit doit être un entier")
     });
-
-    const handleClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
-        if (reason === 'clickaway') {
-            return;
-        }
-
-        setSnackBarSucces(false);
-        setSnackBarEroor(false);
-    };
 
 
     const {
@@ -64,10 +54,10 @@ export default function ProduitForm({ produit }: ProduitFormProp): JSX.Element {
 
         FactureDataService.AddProduitPanier(produit.id, quantite)
             .then((responce) => {
-                setSnackBarSucces(true);
+                enqueueSnackbar("Le produit a été ajouter avec succès", {variant : "success"})
             })
             .catch((err) => {
-                setSnackBarEroor(true);
+                enqueueSnackbar("Un erreur est survenue lors de l'ajout du produit", {variant : "error"})
             });
 
     }
@@ -101,19 +91,6 @@ export default function ProduitForm({ produit }: ProduitFormProp): JSX.Element {
             </Container>
             <Typography sx={{ mb: 2, height: 12 }} color="Red">{errors.quantite?.message}</Typography>
             <Button type="submit" sx={{ background: "#FFEE00ff", color: "black", ":hover": { bgcolor: "#FFEE00AA" } }} variant="contained" size="medium" startIcon={<AddShoppingCartIcon />}>Ajouté au panier</Button>
-
-            <Snackbar open={snackBarSucces} autoHideDuration={1200} onClose={handleClose}>
-                <Alert severity="success" sx={{ width: '100%' }}>
-                    Le produit a été ajouter avec succès
-                </Alert>
-            </Snackbar>
-
-            <Snackbar open={snackBarEroor} autoHideDuration={1200} onClose={handleClose}>
-                <Alert severity="error" sx={{ width: '100%' }}>
-                    Un erreur est survenue lors de l'ajout du produit
-                </Alert>
-            </Snackbar>
-
         </Box>
     )
 }

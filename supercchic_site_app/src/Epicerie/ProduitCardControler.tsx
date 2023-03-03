@@ -21,7 +21,6 @@ export default function ProduitCardControler(): JSX.Element {
 
 
     useEffect(() => {
-
         if (rechercheDepartement === undefined) {
             ProduitDataService.getByFiltreAndPage(pageActuel, recherche)
                 .then((response) => {
@@ -43,6 +42,10 @@ export default function ProduitCardControler(): JSX.Element {
         }
 
     }, [pageActuel, recherche, rechercheDepartement]);
+
+    useEffect(() => {
+        setPageActuel(1);
+    },[recherche, rechercheDepartement])
 
     const handlePageActuelChange = (e: any, value: number): void => {
         setPageActuel(value)

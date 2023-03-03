@@ -1,10 +1,11 @@
-import { Button, Typography } from "@mui/material";
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogProps, DialogTitle, FormControl, FormControlLabel, InputLabel, MenuItem, Select, SelectChangeEvent, Switch, Typography } from "@mui/material";
 import { Container } from "@mui/system";
 import { response } from "express";
 import { useEffect, useRef, useState } from "react";
 import IfactureData from "../DataInterfaces/IFactureData";
 import IProduitFactureData from "../DataInterfaces/IProduitFactureData";
-import FactureDataService from "../DataServices/FactureDataService";
+import FactureDataService from "../DataServices/FactureDataService"
+import Facture from "./Facture";
 import PanierCard from "./PanieCard";
 
 
@@ -15,8 +16,10 @@ export default function PanierCardControler(): JSX.Element {
     const [facture, setFacture] = useState<IfactureData>();
     const [factureModifie, setFactureModifie] = useState<boolean>(true);
 
+    const [open, setOpen] = useState(false);
+
     useEffect(() => {
-        if(factureModifie) {
+        if (factureModifie) {
             setFactureModifie(false);
             FactureDataService.GetFactureEnCours()
                 .then((response) => {
@@ -91,6 +94,13 @@ export default function PanierCardControler(): JSX.Element {
             })
     }
 
+    const handleClickOpen = () => {
+        setOpen(true);
+    };
+    const handleClose = () => {
+        setOpen(false);
+    };
+
     const calculetotalFacture = () => {
 
         let total = 0.00;
@@ -99,8 +109,8 @@ export default function PanierCardControler(): JSX.Element {
         });
 
         let formatter = new Intl.NumberFormat("fr-ca", {
-            style : "currency",
-            currency : "CAD"
+            style: "currency",
+            currency: "CAD"
         })
 
         return formatter.format(total);
@@ -118,8 +128,18 @@ export default function PanierCardControler(): JSX.Element {
                 <PanierCard handleSuprimerProduit={suprimerProduit} handleModifieProduit={modifierUnProduit} key={produitFacture.id} produitFacture={produitFacture} />
             ))}
 
-            <Typography variant="h5" sx={{ mb : 1 }}>Total : {calculetotalFacture()}</Typography>
-            <Button variant="contained"  sx={{ background: "#FFEE00ff", color: "black", ":hover": { bgcolor: "#FFEE00AA" }, width : 250 }}>Commender</Button>
+            <Typography variant="h5" sx={{ mb: 1 }}>Total : {calculetotalFacture()}</Typography>
+            <Button variant="contained" onClick={handleClickOpen} sx={{ background: "#FFEE00ff", color: "black", ":hover": { bgcolor: "#FFEE00AA" }, width: 250 }}>Commander</Button>
+
+            <Dialog
+                fullWidth={true}
+                maxWidth={"lg"}
+                open={open}
+                onClose={handleClose}
+            >
+                <Facture produitFacture={facture?.produit_factures} total={calculetotalFacture()} handleClose={handleClose}></Facture>
+            </Dialog>
+
         </Container>
     )
 }
