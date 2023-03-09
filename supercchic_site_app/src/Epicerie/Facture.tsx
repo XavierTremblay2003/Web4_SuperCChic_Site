@@ -11,6 +11,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import FormTextField from "../Controls/FormTextField";
 import FactureDataService from "../DataServices/FactureDataService";
 import IfactureData from "../DataInterfaces/IFactureData";
+import useScript from "../hooks/useScript";
 
 
 type FactureProps = {
@@ -51,6 +52,8 @@ const formSchema = yup.object().shape({
 });
 
 export default function Facture({ handleClose, produitFacture, total,handleSetFacture }: FactureProps): JSX.Element {
+
+    useScript("http://ws1.postescanada-canadapost.ca/js/addresscomplete-2.30.min.js?key=bt93-kf34-df32-ey55")
 
     const {
         formState: { errors },
