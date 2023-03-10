@@ -14,7 +14,7 @@ import useScript from "../hooks/useScript";
 import { AddressAutocompleteValue } from 'mui-address-autocomplete';
 import AddressAutocomplete from 'mui-address-autocomplete';
 import SecureshipRatesDataService, { RootObject, FromAddress, ToAddress, Package } from "../DataServices/SecureshipRatesDataService"
-
+import { Url } from "url";
 
 
 type FactureProps = {
@@ -135,15 +135,38 @@ export default function Facture({ handleClose, produitFacture, total, handleSetF
         };
 
         let jsonCote: string = JSON.stringify(rootObject);
+        console.log(jsonCote);
 
-        SecureshipRatesDataService.GetRates(jsonCote)
+        fetch("https://secureship.ca/webship/api/rates", {
+            method : 'GET',
+            headers: {
+                'content-type': 'application/x-www-form-urlencoded',
+                'Access-Control-Allow-Origin' : '*'
+            },
+        })
+        .then((responce) => {
+            responce.text()
+            .then((json) => {
+                console.log(json);
+            })
+            .catch((err) => {
+                console.log(err);
+            })
+        })
+        .catch((err) => {
+            console.log("Cote api inacccésible");
+            console.log(err);
+        })
+
+
+        /*SecureshipRatesDataService.GetRates(jsonCote)
             .then((responce) => {
                 console.log(responce);
             })
             .catch((err) => {
                 console.log("Cote api inacccésible");
                 console.log(err);
-            })
+            }) */
     }
 
 

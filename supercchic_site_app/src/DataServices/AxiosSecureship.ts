@@ -7,11 +7,11 @@ const axiosInstanceSecureship = axios.create({
   baseURL,
   timeout: 30000, // 30 seconds
   headers: {
-    'Access-Control-Allow-Origin' : '*',
-    'Access-Control-Allow-Methods' : '*',
+    'Access-Control-Allow-Origin': '*',
     'Content-Type': 'application/json',
     'Accept': 'application/json',
-  }
+    'Access-Control-Allow-Methods' : 'GET, PUT, POST, DELETE, OPTIONS',
+  },
 });
 
 axiosInstanceSecureship.interceptors.request.use((request) => {
