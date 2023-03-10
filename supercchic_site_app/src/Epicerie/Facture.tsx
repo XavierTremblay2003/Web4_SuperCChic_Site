@@ -13,65 +13,7 @@ import IfactureData from "../DataInterfaces/IFactureData";
 import useScript from "../hooks/useScript";
 import { AddressAutocompleteValue } from 'mui-address-autocomplete';
 import AddressAutocomplete from 'mui-address-autocomplete';
-import CanadaPostClient from "../DataServices/canadapost";
-import internal from "stream";
-
-class Scenario {
-    parcelCharacteristics: ParcelCharacteristics;
-    originPostalCode: string;
-    destination: Domestic | UnitedStates | internal
-
-    constructor(originPostalCode : string, destination : Domestic | UnitedStates | internal ,weight : number ,lenght : number, width : number, height : number) {
-        this.originPostalCode = originPostalCode;
-        this.destination = destination;
-        this.parcelCharacteristics = new ParcelCharacteristics(weight,lenght,width,height);
-      };
-
-}
-
-class Domestic {
-    postalCode : string
-    constructor(postalCode : string) {
-        this.postalCode = postalCode
-      };
-}
-
-class UnitedStates {
-    postalCode : string
-    constructor(postalCode : string) {
-        this.postalCode = postalCode
-      };
-}
-
-class International  {
-    postalCode : string
-    constructor(postalCode : string) {
-        this.postalCode = postalCode
-      };
-}
-
-
-class ParcelCharacteristics {
-    weight: number;
-    dimensions: Dimensions;
-
-    constructor(weight : number ,lenght : number, width : number, height : number) {
-        this.weight = weight;
-        this.dimensions = new Dimensions(lenght,width,height);
-      };
-}
-
-class Dimensions {
-    length: number;
-    width: number;
-    height: number;
-
-    constructor(lenght : number, width : number, height : number) {
-        this.length = lenght;
-        this.width = width;
-        this.height = height;
-      };
-}
+import SecureshipRatesDataService, { RootObject, FromAddress, ToAddress, Package } from "../DataServices/SecureshipRatesDataService"
 
 
 
@@ -114,8 +56,6 @@ const formSchema = yup.object().shape({
 
 export default function Facture({ handleClose, produitFacture, total, handleSetFacture }: FactureProps): JSX.Element {
 
-    const cpClient = new CanadaPostClient("2031982", "Info2020!")
-
     const {
         formState: { errors },
         handleSubmit,
@@ -135,13 +75,75 @@ export default function Facture({ handleClose, produitFacture, total, handleSetF
             })
     }
 
-    const onchangeAddr = (e: any, value: AddressAutocompleteValue | null) => {
-        let addr = value
+    const onchangeAddr = (e: any, value: any | null) => {
 
-        
-        let scenario = new Scenario("G7H1Z6",new Domestic("H1A1L9"),12,5,5,5);
+        if (value === null) {
+            return;
+        }
 
-        let test = cpClient.getRates(scenario);
+        console.log(value);
+
+        let fromAddr: FromAddress = {
+            PostalCode: "G7H1Z6",
+            City: "Chicoutimi",
+            CountryCode: "CA",
+            Residential: false
+        };
+
+        let postalCode: string = "";
+        let city: string = "";
+        let contryCode: string = "";
+
+        value.address_components.forEach((addrInfo: any) => {
+
+            if (addrInfo.types.indexOf("locality") > -1) {
+                city = addrInfo.short_name
+            }
+
+            if (addrInfo.types.indexOf("country") > -1) {
+                contryCode = addrInfo.short_name
+            }
+
+            if (addrInfo.types.indexOf("postal_code") > -1) {
+                postalCode = addrInfo.short_name
+            }
+        })
+
+        let toAddr: ToAddress = {
+            PostalCode: postalCode,
+            City: city,
+            CountryCode: contryCode,
+            Residential: true
+        };
+
+        let packageBase: Package = {
+            Weight: "15",
+            WeightUnits: "LBS"
+        };
+
+        let rootObject: RootObject = {
+            ApiKey: "ac54ce1a-f207-4948-9938-05abe0893927",
+            CurrencyCode: "CAD",
+            AccountNumber: "139126",
+            Username: "2031982@etu.cchic.ca",
+            ReturnSampleData: "false",
+            BillingPostalCode: fromAddr.PostalCode,
+            FromAddress: fromAddr,
+            ToAddress: toAddr,
+            PackageType: "MyPackage",
+            Packages: [packageBase]
+        };
+
+        let jsonCote: string = JSON.stringify(rootObject);
+
+        SecureshipRatesDataService.GetRates(jsonCote)
+            .then((responce) => {
+                console.log(responce);
+            })
+            .catch((err) => {
+                console.log("Cote api inacccésible");
+                console.log(err);
+            })
     }
 
 
