@@ -13,20 +13,43 @@ import IfactureData from "../DataInterfaces/IFactureData";
 import useScript from "../hooks/useScript";
 import { AddressAutocompleteValue } from 'mui-address-autocomplete';
 import AddressAutocomplete from 'mui-address-autocomplete';
-import CanadaPostClient from "../DataServices/canadapost"
+import CanadaPostClient from "../DataServices/canadapost";
+import internal from "stream";
 
 class Scenario {
     parcelCharacteristics: ParcelCharacteristics;
     originPostalCode: string;
-    destination: string;
+    destination: Domestic | UnitedStates | internal
 
-    constructor(originPostalCode : string, destination : string ,weight : number ,lenght : number, width : number, height : number) {
+    constructor(originPostalCode : string, destination : Domestic | UnitedStates | internal ,weight : number ,lenght : number, width : number, height : number) {
         this.originPostalCode = originPostalCode;
         this.destination = destination;
         this.parcelCharacteristics = new ParcelCharacteristics(weight,lenght,width,height);
       };
 
 }
+
+class Domestic {
+    postalCode : string
+    constructor(postalCode : string) {
+        this.postalCode = postalCode
+      };
+}
+
+class UnitedStates {
+    postalCode : string
+    constructor(postalCode : string) {
+        this.postalCode = postalCode
+      };
+}
+
+class International  {
+    postalCode : string
+    constructor(postalCode : string) {
+        this.postalCode = postalCode
+      };
+}
+
 
 class ParcelCharacteristics {
     weight: number;
@@ -115,8 +138,8 @@ export default function Facture({ handleClose, produitFacture, total, handleSetF
     const onchangeAddr = (e: any, value: AddressAutocompleteValue | null) => {
         let addr = value
 
-        let scenario = new Scenario("G7H1Z6","H1A1L9",12,5,5,5);
-
+        
+        let scenario = new Scenario("G7H1Z6",new Domestic("H1A1L9"),12,5,5,5);
 
         let test = cpClient.getRates(scenario);
     }
