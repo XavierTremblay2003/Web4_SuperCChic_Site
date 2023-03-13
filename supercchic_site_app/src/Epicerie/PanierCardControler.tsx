@@ -140,7 +140,7 @@ export default function PanierCardControler(): JSX.Element {
                 open={open}
                 onClose={handleClose}
             >
-                <Facture handleSetFacture={setFacture} produitFacture={facture?.produit_factures} total={calculetotalFacture()} handleClose={handleClose}></Facture>
+                <Facture handleSetFacture={setFacture} produitFacture={facture?.produit_factures} sousTotal={calculetotalFacture()} handleClose={handleClose}></Facture>
             </Dialog>
 
         </Container>

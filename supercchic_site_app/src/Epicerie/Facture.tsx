@@ -1,4 +1,4 @@
-import { Box, Button, DialogActions, DialogContent, DialogTitle, Grid, TextField, Typography } from "@mui/material";
+import { Autocomplete, Box, Button, DialogActions, DialogContent, DialogTitle, Grid, TextField, Typography } from "@mui/material";
 import { Container } from "@mui/system";
 import { type } from "@testing-library/user-event/dist/type";
 import { useEffect, useState } from "react";
@@ -13,15 +13,16 @@ import IfactureData from "../DataInterfaces/IFactureData";
 import useScript from "../hooks/useScript";
 import { AddressAutocompleteValue } from 'mui-address-autocomplete';
 import AddressAutocomplete from 'mui-address-autocomplete';
-import SecureshipRatesDataService, { RootObject, FromAddress, ToAddress, Package } from "../DataServices/SecureshipRatesDataService"
 import { Url } from "url";
+import SecureshipRatesDataService from "../DataServices/SecureshipRatesDataService";
+import { strict } from "assert";
 
 
 type FactureProps = {
     handleClose: () => void
     handleSetFacture: React.Dispatch<React.SetStateAction<IfactureData | undefined>>
     produitFacture: IProduitFactureData[] | undefined
-    total: string
+    sousTotal: string
 }
 
 type FormPayerFacture = {
@@ -54,7 +55,7 @@ const formSchema = yup.object().shape({
         .required("L'adress est obligatoire")
 });
 
-export default function Facture({ handleClose, produitFacture, total, handleSetFacture }: FactureProps): JSX.Element {
+export default function Facture({ handleClose, produitFacture, sousTotal, handleSetFacture }: FactureProps): JSX.Element {
 
     const {
         formState: { errors },
@@ -78,17 +79,9 @@ export default function Facture({ handleClose, produitFacture, total, handleSetF
     const onchangeAddr = (e: any, value: any | null) => {
 
         if (value === null) {
+            setMethodesLivraison([]);
             return;
         }
-
-        console.log(value);
-
-        let fromAddr: FromAddress = {
-            PostalCode: "G7H1Z6",
-            City: "Chicoutimi",
-            CountryCode: "CA",
-            Residential: false
-        };
 
         let postalCode: string = "";
         let city: string = "";
@@ -109,66 +102,48 @@ export default function Facture({ handleClose, produitFacture, total, handleSetF
             }
         })
 
-        let toAddr: ToAddress = {
-            PostalCode: postalCode,
-            City: city,
-            CountryCode: contryCode,
-            Residential: true
-        };
-
-        let packageBase: Package = {
-            Weight: "15",
-            WeightUnits: "LBS"
-        };
-
-        let rootObject: RootObject = {
-            ApiKey: "ac54ce1a-f207-4948-9938-05abe0893927",
-            CurrencyCode: "CAD",
-            AccountNumber: "139126",
-            Username: "2031982@etu.cchic.ca",
-            ReturnSampleData: "false",
-            BillingPostalCode: fromAddr.PostalCode,
-            FromAddress: fromAddr,
-            ToAddress: toAddr,
-            PackageType: "MyPackage",
-            Packages: [packageBase]
-        };
-
-        let jsonCote: string = JSON.stringify(rootObject);
-        console.log(jsonCote);
-
-        fetch("https://secureship.ca/webship/api/rates", {
-            method : 'GET',
-            headers: {
-                'content-type': 'application/x-www-form-urlencoded',
-                'Access-Control-Allow-Origin' : '*'
-            },
-        })
-        .then((responce) => {
-            responce.text()
-            .then((json) => {
-                console.log(json);
-            })
-            .catch((err) => {
-                console.log(err);
-            })
-        })
-        .catch((err) => {
-            console.log("Cote api inacccésible");
-            console.log(err);
-        })
 
 
-        /*SecureshipRatesDataService.GetRates(jsonCote)
+        SecureshipRatesDataService.GetRates(postalCode, city, contryCode)
             .then((responce) => {
-                console.log(responce);
+                let rates = responce.data;
+                let methodeLiv = Array<[string, number]>();
+
+                rates.Rates.forEach((rates) => {
+                    methodeLiv.push([rates.ServiceName, rates.Total]);
+                })
+
+                setMethodesLivraison(methodeLiv);
+
+
             })
             .catch((err) => {
-                console.log("Cote api inacccésible");
-                console.log(err);
-            }) */
+                console.log("Cote API innacsésible");
+            })
     }
 
+    const [methodesLivraison, setMethodesLivraison] = useState<Array<[string, number]>>([]);
+    const [total, setTotal] = useState<number>(0);
+    const [coupLivraison, setCoupLivraison] = useState<number>(0);
+
+    const handleChangeMethodeLivraison = (e: any, methode: [string,number] | null) => {
+
+        if( methode === null) {
+            setCoupLivraison(0);
+            setTotal(0);
+            return;
+        }
+
+        setCoupLivraison(methode[1]);
+        setTotal(methode[1] + Number(sousTotal.split('$')[0].trim().replace(',','.')))
+
+    }
+
+    const handleAddressInputChange = (e: any) => {
+        if (e.target.value === "") {
+            setMethodesLivraison([])
+        }
+    }
 
     const formatter = new Intl.NumberFormat("fr-ca", {
         style: "currency",
@@ -196,7 +171,14 @@ export default function Facture({ handleClose, produitFacture, total, handleSetF
                     <Box border={1} sx={{ p: 2, mt: 1 }}>
                         <Typography sx={{ mb: 1 }} variant="h5">Information de Livraison</Typography>
                         <Container>
-                            <AddressAutocomplete value={null} fields={['geometry']} onChange={(e: any, value: AddressAutocompleteValue | null) => onchangeAddr(e, value)} label="Address" apiKey="AIzaSyDgO9ft1mnb1HYH0KTuL0BAjIvSFH-r9so" />
+                            <AddressAutocomplete sx={{ mb: 1 }} value={null} fields={['geometry']} onChange={(e: any, value: AddressAutocompleteValue | null) => onchangeAddr(e, value)} label="Address" apiKey="AIzaSyDgO9ft1mnb1HYH0KTuL0BAjIvSFH-r9so" />
+                            <Autocomplete onChange={handleChangeMethodeLivraison} disabled={methodesLivraison.length === 0} options={methodesLivraison} renderInput={(params) => <TextField {...params} label="Method de livraison" />}
+                                renderOption={(props, option) => (
+                                    <Box component="li" sx={{ '& > img': { mr: 2, flexShrink: 0 } }} {...props}>
+                                        <Typography sx={{ p: 0.5 }}>{option[0]} : {option[1]} $</Typography>
+                                    </Box>
+                                )}
+                            />
                         </Container>
                     </Box>
                 </Grid>
@@ -214,13 +196,24 @@ export default function Facture({ handleClose, produitFacture, total, handleSetF
                                 )
                             })}
                         </Container>
+                        <Container sx={{ display: "flex", justifyContent: "right" }}>
+                            <Box textAlign="right">
+                                <Typography variant="h5">Sous-Total : </Typography>
+                                <Typography variant="h5">Livraison : </Typography>
+                                <Typography variant="h5" sx={{ fontWeight: "bold" }}>Total :</Typography>
+                            </Box>
+                            <Box textAlign="right" sx={{ ml: 1 }}>
+                                <Typography variant="h5">{sousTotal}</Typography>
+                                <Typography variant="h5">{formatter.format(coupLivraison)}</Typography>
+                                <Typography variant="h5" sx={{ fontWeight: "bold" }}>{formatter.format(total)}</Typography>
+                            </Box>
 
-                        <Typography variant="h4">Total : {total}</Typography>
+                        </Container>
                     </Box>
                 </Grid>
             </Grid>
             <DialogActions sx={{ display: "flex", justifyContent: "center" }}>
-                <Button type="submit" autoFocus sx={{ background: "#FFEE00ff", color: "black", ":hover": { bgcolor: "#FFEE00AA" }, width: 250 }}>
+                <Button disabled={total === 0 } type="submit" autoFocus sx={{ background: "#FFEE00ff", color: "black", ":hover": { bgcolor: "#FFEE00AA" }, width: 250 }}>
                     Payer
                 </Button>
             </DialogActions>
